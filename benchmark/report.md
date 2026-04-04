@@ -132,17 +132,7 @@ The requirements demand modularity for future changes (GPU monitoring, database 
 6. ✅ **Consistent latency** for reliable dashboard performance
 7. ✅ **Extensible design** for future GPU and new metric monitoring
 
-## Recommendation
 
-**Proceed with InfluxDB as the primary database for MLab Phase 2 development.**
-
-PostgreSQL can be retained as a **relational metadata store** (node configurations, user accounts), but InfluxDB should handle all time-series energy metrics.
-
-### Next Steps:
-1. Implement InfluxDB with retention policies for energy data
-2. Configure Telegraf agents on workstation nodes
-3. Build dashboard queries using Flux for downsampling and comparisons
-4. Set up continuous queries for automated aggregation
 
 ---
 
