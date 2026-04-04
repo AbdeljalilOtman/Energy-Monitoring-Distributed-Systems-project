@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-04-04T21:34:00Z",
+  "metrics": [
+    {
+      "NodeID": "node_1",
+      "WorkloadTag": "training",
+      "KPI_name": "CPU_Utility",
+      "Value": 45.5
+    },
+    {
+      "NodeID": "node_1",
+      "WorkloadTag": "training",
+      "KPI_name": "Memory_Usage",
+      "Value": 62.3
+    },
+    {
+      "NodeID": "node_1",
+      "WorkloadTag": "training",
+      "KPI_name": "GPU_Utilization",
+      "Value": 78.9
+    },
+    {
+      "NodeID": "node_1",
+      "WorkloadTag": "inference",
+      "KPI_name": "Model_Inference_Time",
+      "Value": 125.5
+    },
+    {
+      "NodeID": "node_2",
+      "WorkloadTag": "data_prep",
+      "KPI_name": "CPU_Utility",
+      "Value": 38.2
+    },
+    {
+      "NodeID": "node_2",
+      "WorkloadTag": "data_prep",
+      "KPI_name": "Disk_IO",
+      "Value": 42.1
+    }
+  ]
+}

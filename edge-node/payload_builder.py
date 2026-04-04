@@ -9,7 +9,7 @@ and flattening the data into the database rows to satisfy the architecture spec.
 """
 
 import time
-from cpu_metrics import collect_cpu_metrics
+from cpu_metrics import collect_cpu_metrics, collect_memory_metrics, collect_disk_metrics
 from power_metrics import collect_power_metrics
 
 
@@ -39,6 +39,8 @@ def build_payload(node_id, workload_tag, interval=1.0):
     # we can thread them.
     cpu_data = collect_cpu_metrics(percpu_interval=interval)
     power_data = collect_power_metrics(interval=interval)
+    memory_data = collect_memory_metrics()
+    disk_data = collect_disk_metrics()
 
     metrics = {}
 
@@ -71,6 +73,18 @@ def build_payload(node_id, workload_tag, interval=1.0):
         name = domain["name"]  # e.g., 'package-0'
         add_metric(f"power_watts_{name}", domain["power_watts"])
         add_metric(f"energy_joules_{name}", domain["energy_delta_joules"])
+
+    # 5. Flatten Memory Metrics
+    add_metric("memory_percent", memory_data.get("memory_percent"))
+    add_metric("memory_available_mb", memory_data.get("memory_available_mb"))
+    add_metric("memory_used_mb", memory_data.get("memory_used_mb"))
+    add_metric("memory_total_mb", memory_data.get("memory_total_mb"))
+
+    # 6. Flatten Disk I/O Metrics
+    add_metric("disk_read_mb", disk_data.get("disk_read_mb"))
+    add_metric("disk_write_mb", disk_data.get("disk_write_mb"))
+    add_metric("disk_read_count", disk_data.get("disk_read_count"))
+    add_metric("disk_write_count", disk_data.get("disk_write_count"))
 
     return {
         "timestamp": timestamp,

@@ -7,6 +7,7 @@ that returns a structured dict — no side effects (no printing, no
 network calls). This makes it testable and composable.
 """
 
+import logging
 import psutil
 
 
@@ -79,3 +80,69 @@ def collect_cpu_metrics(percpu_interval=1.0):
         "cpu_freq_max_mhz": freq_max,
         "cpu_temperature_c": temp_c,
     }
+
+
+def collect_memory_metrics():
+    """
+    Collect memory utilization metrics.
+
+    Returns:
+        dict with keys:
+            - memory_percent (float): system-wide memory usage %
+            - memory_available_mb (float): available memory in MB
+            - memory_used_mb (float): used memory in MB
+            - memory_total_mb (float): total memory in MB
+    """
+    try:
+        mem = psutil.virtual_memory()
+        return {
+            "memory_percent": round(mem.percent, 2),
+            "memory_available_mb": round(mem.available / (1024 * 1024), 2),
+            "memory_used_mb": round(mem.used / (1024 * 1024), 2),
+            "memory_total_mb": round(mem.total / (1024 * 1024), 2),
+        }
+    except Exception as e:
+        logging.warning(f"Failed to collect memory metrics: {e}")
+        return {
+            "memory_percent": None,
+            "memory_available_mb": None,
+            "memory_used_mb": None,
+            "memory_total_mb": None,
+        }
+
+
+def collect_disk_metrics():
+    """
+    Collect disk I/O metrics.
+
+    Returns:
+        dict with keys:
+            - disk_read_mb (float): total bytes read in MB
+            - disk_write_mb (float): total bytes written in MB
+            - disk_read_count (int): total read operations
+            - disk_write_count (int): total write operations
+    """
+    try:
+        disk = psutil.disk_io_counters()
+        if disk:
+            return {
+                "disk_read_mb": round(disk.read_bytes / (1024 * 1024), 2),
+                "disk_write_mb": round(disk.write_bytes / (1024 * 1024), 2),
+                "disk_read_count": disk.read_count,
+                "disk_write_count": disk.write_count,
+            }
+        else:
+            return {
+                "disk_read_mb": None,
+                "disk_write_mb": None,
+                "disk_read_count": None,
+                "disk_write_count": None,
+            }
+    except Exception as e:
+        logging.warning(f"Failed to collect disk metrics: {e}")
+        return {
+            "disk_read_mb": None,
+            "disk_write_mb": None,
+            "disk_read_count": None,
+            "disk_write_count": None,
+        }

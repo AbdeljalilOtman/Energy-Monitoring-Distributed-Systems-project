@@ -1,0 +1,39 @@
+{
+  "node_config": {
+    "node_id": "edge-node-1",
+    "workload_tag": "training",
+    "poll_interval_sec": 5.0,
+    "backend_url": "http://localhost:5000",
+    "dry_run": true
+  },
+  "description": {
+    "node_id": "Unique identifier for this edge node (e.g., 'laptop-gpu', 'server-1')",
+    "workload_tag": "Current workload context (e.g., 'training', 'inference', 'data_prep')",
+    "poll_interval_sec": "Time between measurements in seconds. Higher = less overhead but slower updates",
+    "backend_url": "Base URL of the central monitoring backend (without /api/kpi/submit)",
+    "dry_run": "If true, prints data locally instead of sending to backend. Use false for production"
+  },
+  "examples": {
+    "local_development": {
+      "node_id": "laptop-dev",
+      "workload_tag": "testing",
+      "poll_interval_sec": 2.0,
+      "backend_url": "http://127.0.0.1:5000",
+      "dry_run": true
+    },
+    "local_production": {
+      "node_id": "server-gpu-01",
+      "workload_tag": "inference",
+      "poll_interval_sec": 5.0,
+      "backend_url": "http://127.0.0.1:5000",
+      "dry_run": false
+    },
+    "remote_deployment": {
+      "node_id": "remote-node-aws",
+      "workload_tag": "training",
+      "poll_interval_sec": 10.0,
+      "backend_url": "http://central-dashboard.example.com:5000",
+      "dry_run": false
+    }
+  }
+}

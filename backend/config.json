@@ -1,0 +1,10 @@
+{
+  "polling_interval_seconds": 5,
+  "node_id": "node_1",
+  "kpi_source": "kpi_data.json",
+  "dashboard_url": "http://localhost:5000",
+  "database": {
+    "type": "sqlite",
+    "path": "test_db/benchmark_test.db"
+  }
+}
