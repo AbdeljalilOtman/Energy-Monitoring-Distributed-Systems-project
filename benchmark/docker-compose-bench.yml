@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  postgresql:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: mlab
+      POSTGRES_PASSWORD: mlab
+      POSTGRES_DB: mlab_bench
+    command: >
+      postgres
+        -c shared_buffers=2GB
+        -c work_mem=256MB
+        -c maintenance_work_mem=512MB
+        -c max_parallel_workers=4
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: mlab
+      POSTGRES_PASSWORD: mlab
+      POSTGRES_DB: mlab_bench
+    volumes:
+      - ts_data:/var/lib/postgresql/data
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: ""  # Empty password
+      CLICKHOUSE_DB: default
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - ch_data:/var/lib/clickhouse
+
+  influxdb:
+    image: influxdb:2.7
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: mlab
+      DOCKER_INFLUXDB_INIT_PASSWORD: mlabpassword
+      DOCKER_INFLUXDB_INIT_ORG: mlab
+      DOCKER_INFLUXDB_INIT_BUCKET: mlab_bench
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: mlab-bench-token
+    volumes:
+      - influx_data:/var/lib/influxdb2
+
+volumes:
+  pg_data:
+  ts_data:
+  ch_data:
+  influx_data:
