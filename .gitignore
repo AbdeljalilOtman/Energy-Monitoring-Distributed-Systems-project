@@ -22,3 +22,6 @@ backend/test_db/*.db
 Thumbs.db
 
 .idea/
+
+# Local architecture notes (do not push)
+backend/BACKEND_DAEMON_DATABASE_DASHBOARD_FLOW.md

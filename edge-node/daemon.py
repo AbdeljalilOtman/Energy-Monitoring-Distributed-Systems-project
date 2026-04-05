@@ -12,6 +12,7 @@ to the backend's flat array format for consistency with the central monitoring s
 import time
 import logging
 import json
+import threading
 import urllib.request
 import urllib.error
 
@@ -30,6 +31,7 @@ def start_daemon(
     node_id: str,
     workload_tag: str = "idle",
     poll_interval_sec: float = 1.0,
+    heartbeat_interval_sec: float = 5.0,
     backend_url: str = None,
     dry_run: bool = True
 ):
@@ -40,6 +42,7 @@ def start_daemon(
         node_id: Identity of the edge node answering the telemetry (e.g., "node-1", "laptop-ml-gpu").
         workload_tag: Contextual label for the current workload (e.g., "training", "inference", "data_prep").
         poll_interval_sec: Time to wait between measurements (in seconds).
+        heartbeat_interval_sec: Edge heartbeat interval used for liveness checks.
         backend_url: The base URL of the backend server (e.g., "http://localhost:5000").
                      The daemon will automatically append "/api/kpi/submit" to this URL.
         dry_run: If True, prints JSON locally instead of sending HTTP. Set to False for production.
@@ -52,6 +55,18 @@ def start_daemon(
     elif not backend_url:
         logging.error("No backend_url provided and dry_run=False. Exiting.")
         return
+
+    stop_event = threading.Event()
+    heartbeat_thread = None
+
+    if not dry_run and backend_url:
+        _register_node(node_id, backend_url, poll_interval_sec, heartbeat_interval_sec)
+        heartbeat_thread = threading.Thread(
+            target=_heartbeat_loop,
+            args=(stop_event, node_id, workload_tag, poll_interval_sec, heartbeat_interval_sec, backend_url),
+            daemon=True
+        )
+        heartbeat_thread.start()
 
     try:
         while True:
@@ -80,9 +95,74 @@ def start_daemon(
             # of the `poll_interval_sec` while it measures hardware diffs.
             
     except KeyboardInterrupt:
+        stop_event.set()
         logging.info("Daemon stopped by user. Exiting gracefully.")
     except Exception as e:
+        stop_event.set()
         logging.error(f"Daemon crashed: {e}")
+
+
+def _make_endpoint_url(base_url: str, endpoint: str):
+    if base_url.endswith(endpoint):
+        return base_url
+    if base_url.endswith("/"):
+        return base_url + endpoint.lstrip("/")
+    return base_url + endpoint
+
+
+def _post_json(url: str, payload: dict, timeout: float = 5.0):
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers={'Content-Type': 'application/json'},
+        method='POST'
+    )
+    with urllib.request.urlopen(req, timeout=timeout) as response:
+        return response.status
+
+
+def _register_node(node_id: str, backend_url: str, poll_interval_sec: float, heartbeat_interval_sec: float):
+    """Best-effort registration call so backend can initialize node state."""
+    register_url = _make_endpoint_url(backend_url, "/api/nodes/register")
+    payload = {
+        "node_id": node_id,
+        "polling_interval": poll_interval_sec,
+        "heartbeat_interval_sec": heartbeat_interval_sec
+    }
+    try:
+        _post_json(register_url, payload, timeout=3.0)
+        logging.info(f"Node registration sent to {register_url}")
+    except Exception as e:
+        logging.warning(f"Node registration failed: {e}")
+
+
+def _heartbeat_loop(
+    stop_event: threading.Event,
+    node_id: str,
+    workload_tag: str,
+    poll_interval_sec: float,
+    heartbeat_interval_sec: float,
+    backend_url: str
+):
+    """Send lightweight heartbeat pings to support liveness detection at server side."""
+    heartbeat_url = _make_endpoint_url(backend_url, "/api/nodes/heartbeat")
+    while not stop_event.is_set():
+        payload = {
+            "node_id": node_id,
+            "workload_tag": workload_tag,
+            "polling_interval": poll_interval_sec,
+            "heartbeat_interval_sec": heartbeat_interval_sec,
+            "sent_at": time.time()
+        }
+        try:
+            status = _post_json(heartbeat_url, payload, timeout=3.0)
+            if status not in (200, 201, 202):
+                logging.warning(f"Heartbeat returned non-success status: {status}")
+        except Exception as e:
+            logging.warning(f"Heartbeat failed: {e}")
+
+        stop_event.wait(max(1.0, heartbeat_interval_sec))
 
 
 def _post_to_backend(payload: dict, url: str):
@@ -95,11 +175,7 @@ def _post_to_backend(payload: dict, url: str):
                    The function will append /api/kpi/submit to this URL.
     """
     # Ensure URL has /api/kpi/submit endpoint
-    if not url.endswith("/api/kpi/submit"):
-        if url.endswith("/"):
-            url = url + "api/kpi/submit"
-        else:
-            url = url + "/api/kpi/submit"
+    url = _make_endpoint_url(url, "/api/kpi/submit")
     
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(
@@ -127,8 +203,9 @@ if __name__ == "__main__":
     
     start_daemon(
         node_id=f"{local_hostname}-node",
-        workload_tag="training",
-        poll_interval_sec=5.0,
-        backend_url="http://127.0.0.1:5000",  # Points to Flask backend
-        dry_run=True   # Set to False to actually transmit data
+        workload_tag="testing",
+        poll_interval_sec=1.0,
+        heartbeat_interval_sec=1.0,
+        backend_url="https://g2f61m5t-5000.uks1.devtunnels.ms/",  # Points to Flask backend
+        dry_run=False   # Set to False to actually transmit data
     )

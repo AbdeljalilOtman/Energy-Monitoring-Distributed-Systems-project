@@ -7,6 +7,23 @@
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        :root {
+            --bg: #f3f6fb;
+            --panel: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --line: #e5e7eb;
+            --brand: #1248d6;
+            --brand-soft: #dbeafe;
+            --ok: #047857;
+            --ok-soft: #d1fae5;
+            --warn: #b45309;
+            --warn-soft: #fef3c7;
+            --danger: #b91c1c;
+            --danger-soft: #fee2e2;
+            --shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,316 +31,463 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
+            font-family: 'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            background:
+                radial-gradient(circle at 20% 0%, #dbeafe 0%, rgba(219, 234, 254, 0) 40%),
+                radial-gradient(circle at 90% 10%, #e0e7ff 0%, rgba(224, 231, 255, 0) 42%),
+                var(--bg);
+            color: var(--text);
             min-height: 100vh;
-            padding: 20px;
+            padding: 22px;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1480px;
             margin: 0 auto;
         }
 
         header {
-            text-align: center;
+            background: linear-gradient(120deg, #0f2f7f 0%, #1248d6 60%, #2a7bff 100%);
             color: white;
-            margin-bottom: 40px;
-            animation: slideDown 0.6s ease;
+            border-radius: 18px;
+            padding: 22px 26px;
+            margin-bottom: 18px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
-        header h1 {
-            font-size: 2.5rem;
+        .hero-copy h1 {
+            font-size: 1.8rem;
+            letter-spacing: 0.2px;
+            margin-bottom: 6px;
+        }
+
+        .hero-copy p {
+            opacity: 0.92;
+            font-size: 0.98rem;
+        }
+
+        .hero-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(110px, 1fr));
+            gap: 10px;
+            min-width: 240px;
+        }
+
+        .meta-pill {
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.26);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .meta-label {
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            opacity: 0.85;
+            margin-bottom: 4px;
+        }
+
+        .meta-value {
+            font-size: 1rem;
             font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
         }
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(3, minmax(250px, 1fr));
+            gap: 14px;
+            margin-bottom: 14px;
         }
 
         .card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: var(--shadow);
         }
 
         .card-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #667eea;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .card-title::before {
-            content: '';
-            display: inline-block;
-            width: 4px;
-            height: 20px;
-            background: #667eea;
-            border-radius: 2px;
+            font-size: 0.86rem;
+            text-transform: uppercase;
+            letter-spacing: 0.75px;
+            color: var(--muted);
+            margin-bottom: 12px;
+            font-weight: 700;
         }
 
         .metric {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+            border-top: 1px solid var(--line);
         }
 
-        .metric:last-child {
-            border-bottom: none;
+        .metric:first-of-type {
+            border-top: none;
+            padding-top: 0;
         }
 
         .metric-label {
-            font-weight: 500;
-            color: #666;
+            font-size: 0.92rem;
+            color: var(--muted);
+            font-weight: 600;
         }
 
         .metric-value {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            color: #667eea;
+            color: var(--brand);
         }
 
         .status-badge {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
             padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.72rem;
+            font-weight: 800;
             text-transform: uppercase;
+            letter-spacing: 0.7px;
         }
 
         .status-healthy {
-            background: #d4edda;
-            color: #155724;
+            background: var(--ok-soft);
+            color: var(--ok);
+            border: 1px solid #a7f3d0;
         }
 
         .status-unhealthy {
-            background: #f8d7da;
-            color: #721c24;
+            background: var(--danger-soft);
+            color: var(--danger);
+            border: 1px solid #fecaca;
         }
 
-        .status-online {
-            background: #d1ecf1;
-            color: #0c5460;
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(320px, 2.2fr) minmax(260px, 1fr);
+            gap: 14px;
+            margin-bottom: 14px;
         }
 
-        .nodes-section {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            animation: fadeIn 0.6s ease;
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: var(--shadow);
         }
 
-        .nodes-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #667eea;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nodes-title::before {
-            content: '';
-            display: inline-block;
-            width: 5px;
-            height: 25px;
-            background: #667eea;
-            border-radius: 3px;
+        .panel-title {
+            font-size: 1.02rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: #0f172a;
         }
 
         .nodes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 12px;
         }
 
         .node-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 10px;
-            padding: 20px;
-            border-left: 5px solid #667eea;
-            transition: all 0.3s ease;
-        }
-
-        .node-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #fbfdff;
+            padding: 12px;
         }
 
         .node-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .node-id {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .node-metrics {
-            display: flex;
-            flex-direction: column;
+            margin-bottom: 10px;
             gap: 10px;
         }
 
-        .node-metric {
+        .node-id {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #0f172a;
+            overflow-wrap: anywhere;
+        }
+
+        .workload-section {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 9px;
+            margin-bottom: 8px;
+            background: #ffffff;
+        }
+
+        .workload-tag {
+            display: inline-block;
+            font-size: 0.71rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.65px;
+            color: #1d4ed8;
+            background: var(--brand-soft);
+            border: 1px solid #bfdbfe;
+            padding: 4px 8px;
+            border-radius: 999px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-row {
             display: flex;
             justify-content: space-between;
-            background: rgba(255,255,255,0.7);
-            padding: 10px 12px;
-            border-radius: 6px;
-            font-size: 0.95rem;
+            gap: 12px;
+            padding: 6px 0;
+            border-top: 1px dashed var(--line);
         }
 
-        .node-metric-label {
-            color: #666;
-            font-weight: 500;
+        .kpi-row:first-of-type {
+            border-top: none;
         }
 
-        .node-metric-value {
-            color: #667eea;
-            font-weight: 700;
+        .kpi-name {
+            color: #374151;
+            font-size: 0.86rem;
+            overflow-wrap: anywhere;
         }
 
-        .chart-section {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            animation: fadeIn 0.7s ease;
+        .kpi-value {
+            color: #111827;
+            font-size: 0.88rem;
+            font-weight: 800;
+            white-space: nowrap;
         }
 
-        .chart-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin-bottom: 20px;
+        .updated-at {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-top: 6px;
         }
 
         .connectivity-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: 1fr;
+            gap: 10px;
         }
 
         .connection-item {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
             border-radius: 10px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .connection-item:hover {
-            transform: scale(1.05);
+            border: 1px solid var(--line);
+            background: #fff;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            column-gap: 10px;
         }
 
         .connection-status {
-            font-size: 2rem;
-            margin-bottom: 10px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #9ca3af;
+        }
+
+        .connection-status.online {
+            background: #16a34a;
+            box-shadow: 0 0 0 5px rgba(22, 163, 74, 0.14);
+        }
+
+        .connection-status.offline {
+            background: #dc2626;
+            box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.12);
         }
 
         .connection-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
+            font-size: 0.86rem;
+            color: #0f172a;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .connection-state {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.65px;
+            font-weight: 800;
+            color: #6b7280;
+        }
+
+        .chart-section {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+        }
+
+        .chart-title {
+            font-size: 1.03rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #0f172a;
+        }
+
+        .kpi-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .trend-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .node-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .node-selector label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .node-selector select {
+            border: 1px solid #bfdbfe;
+            background: #fff;
+            color: #1e3a8a;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            min-width: 220px;
+        }
+
+        .kpi-filter {
+            border: 1px solid #bfdbfe;
+            background: #eff6ff;
+            color: #1e40af;
+            padding: 7px 10px;
+            border-radius: 999px;
+            font-size: 0.81rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .kpi-filter:hover {
+            background: #dbeafe;
+        }
+
+        .kpi-filter.active {
+            background: var(--brand);
+            color: #fff;
+            border-color: var(--brand);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 380px;
+        }
+
+        .chart-scroll {
+            width: 100%;
+            height: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 4px;
+        }
+
+        .chart-scroll canvas {
+            display: block;
+            height: 360px;
+            min-width: 100%;
         }
 
         .update-counter {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: white;
-            padding: 15px 20px;
-            border-radius: 50px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            font-weight: 600;
-            color: #667eea;
-            z-index: 100;
+            right: 16px;
+            bottom: 16px;
+            background: #0f172a;
+            color: #fff;
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.36);
+            z-index: 50;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .pulse {
             display: inline-block;
-            width: 10px;
-            height: 10px;
-            background: #4ade80;
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
             border-radius: 50%;
-            margin-right: 8px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            animation: pulse 1.8s infinite;
         }
 
         .no-data {
+            border: 1px dashed var(--line);
+            border-radius: 10px;
             text-align: center;
-            color: #999;
-            padding: 40px;
-            font-size: 1.1rem;
+            color: var(--muted);
+            background: #fafafa;
+            padding: 18px;
+            font-size: 0.92rem;
         }
 
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.8rem;
-            }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
 
+        @media (max-width: 1150px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
 
-            .nodes-grid {
+            .layout {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 12px;
+            }
+
+            header {
+                padding: 16px;
+            }
+
+            .hero-copy h1 {
+                font-size: 1.4rem;
+            }
+
+            .hero-meta {
+                grid-template-columns: 1fr;
+                width: 100%;
+            }
+
+            .chart-container {
+                height: 300px;
             }
         }
     </style>
@@ -331,14 +495,14 @@
 <body>
     <div class="container">
         <header>
-            <h1>🤖 ML Workload Monitoring</h1>
-            <p>Real-time KPI Performance Dashboard for Distributed ML Tasks</p>
+            <div class="hero-copy">
+                <h1>MLab Energy Monitoring</h1>
+            </div>
         </header>
 
-        <!-- Summary Cards -->
         <div class="dashboard-grid">
             <div class="card">
-                <div class="card-title">Active Nodes</div>
+                <div class="card-title">Node Health</div>
                 <div class="metric">
                     <span class="metric-label">Total Nodes</span>
                     <span class="metric-value" id="total-nodes">0</span>
@@ -348,33 +512,24 @@
                     <span class="metric-value" id="healthy-nodes" style="color: #4ade80;">0</span>
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Unhealthy</span>
+                    <span class="metric-label">Needs Attention</span>
                     <span class="metric-value" id="unhealthy-nodes" style="color: #f87171;">0</span>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">Workload Types</div>
-                <div class="metric">
-                    <span class="metric-label">Training</span>
-                    <span class="metric-value" id="workload-training">0</span>
-                </div>
-                <div class="metric">
-                    <span class="metric-label">Inference</span>
-                    <span class="metric-value" id="workload-inference">0</span>
-                </div>
-                <div class="metric">
-                    <span class="metric-label">Data Prep</span>
-                    <span class="metric-value" id="workload-dataprep">0</span>
+                <div class="card-title">Workload Distribution</div>
+                <div id="workload-tags-container">
+                    <div class="no-data" style="padding: 10px;">Waiting for workload tags...</div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title">System Status</div>
+                <div class="card-title">Runtime Status</div>
                 <div class="metric">
-                    <span class="metric-label">Status</span>
-                    <span class="status-badge" style="background: #d1ecf1; color: #0c5460;">
-                        <span class="pulse"></span>ONLINE
+                    <span class="metric-label">Dashboard</span>
+                    <span class="status-badge" style="background: var(--ok-soft); color: var(--ok); border: 1px solid #a7f3d0;">
+                        <span class="pulse"></span>Live
                     </span>
                 </div>
                 <div class="metric">
@@ -384,34 +539,39 @@
             </div>
         </div>
 
-        <!-- Nodes Section -->
-        <div class="nodes-section">
-            <div class="nodes-title">Node Metrics & Performance</div>
-            <div class="nodes-grid" id="nodes-container">
-                <div class="no-data">Waiting for node connections...</div>
+        <div class="layout">
+            <div class="panel">
+                <div class="panel-title">Node Metrics and Performance</div>
+                <div class="nodes-grid" id="nodes-container">
+                    <div class="no-data">Waiting for node connections...</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Node Connectivity</div>
+                <div class="connectivity-grid" id="connectivity-container">
+                    <div class="no-data">Waiting for node data...</div>
+                </div>
             </div>
         </div>
 
-        <!-- Charts Section -->
         <div class="chart-section">
-            <div class="chart-title">KPI Trends by Workload</div>
-            <div class="kpi-selector">
-                <button class="kpi-filter active" onclick="filterChart('CPU_Utility')">CPU Utility</button>
-                <button class="kpi-filter" onclick="filterChart('Memory_Usage')">Memory Usage</button>
-                <button class="kpi-filter" onclick="filterChart('GPU_Utilization')">GPU Utilization</button>
-                <button class="kpi-filter" onclick="filterChart('Model_Inference_Time')">Inference Time</button>
-                <button class="kpi-filter" onclick="filterChart('Disk_IO')">Disk I/O</button>
+            <div class="chart-title">KPI Trend Timeline</div>
+            <div class="trend-controls">
+                <div class="node-selector">
+                    <label for="node-selector">Node:</label>
+                    <select id="node-selector" onchange="onTrendNodeChange(this.value)">
+                        <option value="">Waiting for nodes...</option>
+                    </select>
+                </div>
+                <div class="kpi-selector" id="kpi-selector">
+                    <div class="no-data" style="width: 100%;">Waiting for KPI series...</div>
+                </div>
             </div>
             <div class="chart-container">
-                <canvas id="kpiChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Connectivity Section -->
-        <div class="chart-section">
-            <div class="chart-title">Node Connectivity</div>
-            <div class="connectivity-grid" id="connectivity-container">
-                <div class="no-data">Waiting for node data...</div>
+                <div class="chart-scroll" id="chart-scroll">
+                    <canvas id="kpiChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -424,8 +584,32 @@
     <script>
         const socket = io();
         let updateCount = 0;
-        let currentFilter = 'CPU_Utility';
+        let currentFilter = null;
         let chartInstances = {};
+        const trendStateByNode = {};
+        let selectedTrendNodeId = null;
+        const TREND_POLL_INTERVAL_MS = 2000;
+        const MAX_HISTORY_POINTS = 1200;
+        const POINT_SPACING_PX = 26;
+        const CHART_MIN_WIDTH_PX = 900;
+        const EXCLUDED_KPI_NAMES = new Set(['GPU_Utilization', 'Model_Inference_Time']);
+        const KPI_PREFERENCE = [
+            'CPU_Utility_Avg',
+            'CPU_Frequency_MHz',
+            'CPU_Temperature_C',
+            'CPU_Voltage_V',
+            'Power_Watts_Total',
+            'Energy_Joules_Total'
+        ];
+
+        const KPI_LABELS = {
+            CPU_Utility_Avg: 'CPU Utility Avg',
+            CPU_Frequency_MHz: 'CPU Frequency MHz',
+            CPU_Temperature_C: 'CPU Temperature C',
+            CPU_Voltage_V: 'CPU Voltage V',
+            Power_Watts_Total: 'Power Watts Total',
+            Energy_Joules_Total: 'Energy Joules Total'
+        };
 
         socket.on('connect', () => {
             console.log('Connected to dashboard server');
@@ -437,20 +621,24 @@
             refreshDashboard();
         });
 
+        socket.on('node_status_change', () => {
+            refreshDashboard();
+        });
+
         async function refreshDashboard() {
             try {
                 const summaryRes = await fetch('/api/dashboard/summary');
                 const summary = await summaryRes.json();
-                
-                updateSummaryCards(summary);
-                displayNodes(summary);
-                updateCharts(summary);
+
+                const workloadCounts = await displayNodes(summary);
+                updateSummaryCards(summary, workloadCounts);
+                updateConnectivity(summary);
             } catch (err) {
                 console.error('Error refreshing dashboard:', err);
             }
         }
 
-        function updateSummaryCards(summary) {
+        function updateSummaryCards(summary, workloadCounts) {
             const total = summary.length;
             const healthy = summary.filter(s => s.status === 'healthy').length;
             const unhealthy = total - healthy;
@@ -458,22 +646,61 @@
             document.getElementById('total-nodes').textContent = total;
             document.getElementById('healthy-nodes').textContent = healthy;
             document.getElementById('unhealthy-nodes').textContent = unhealthy;
-            document.getElementById('update-rate').textContent = (updateCount / (Date.now() / 60000)).toFixed(1);
+            renderWorkloadDistribution(workloadCounts);
+
+            const minutes = Math.max(1, performance.now() / 60000);
+            document.getElementById('update-rate').textContent = (updateCount / minutes).toFixed(1);
+        }
+
+        function renderWorkloadDistribution(workloadCounts) {
+            const container = document.getElementById('workload-tags-container');
+            const entries = Object.entries(workloadCounts || {})
+                .filter(([, count]) => Number(count) > 0)
+                .sort((a, b) => b[1] - a[1]);
+
+            if (!entries.length) {
+                container.innerHTML = '<div class="no-data" style="padding: 10px;">No workload tags detected yet...</div>';
+                return;
+            }
+
+            container.innerHTML = entries
+                .map(([tag, count]) => `
+                    <div class="metric">
+                        <span class="metric-label">${tag}</span>
+                        <span class="metric-value">${count}</span>
+                    </div>
+                `)
+                .join('');
         }
 
         async function displayNodes(summary) {
             const container = document.getElementById('nodes-container');
+            const workloadCounts = {};
+            const connectedSummary = summary.filter(node => node.connected);
             
-            if (summary.length === 0) {
-                container.innerHTML = '<div class="no-data">No nodes connected yet...</div>';
-                return;
+            if (connectedSummary.length === 0) {
+                container.innerHTML = '<div class="no-data">No connected nodes available...</div>';
+                return workloadCounts;
             }
 
             container.innerHTML = '';
             
-            for (const node of summary) {
-                const metricsRes = await fetch(`/api/metrics/aggregated/${node.NodeID}`);
+            for (const node of connectedSummary) {
+                const [metricsRes, recentMetricsRes] = await Promise.all([
+                    fetch(`/api/metrics/aggregated/${node.NodeID}`),
+                    fetch(`/api/metrics/${node.NodeID}`)
+                ]);
                 const metricsData = await metricsRes.json();
+                const recentMetrics = await recentMetricsRes.json();
+
+                const currentWorkloadTag = recentMetrics
+                    .map(r => ({ ...r, timestamp: r.timestamp || r.Timestamp }))
+                    .filter(r => Boolean(r.timestamp))
+                    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0]?.WorkloadTag || null;
+
+                if (currentWorkloadTag) {
+                    workloadCounts[currentWorkloadTag] = (workloadCounts[currentWorkloadTag] || 0) + 1;
+                }
                 
                 const statusClass = node.status === 'healthy' ? 'status-healthy' : 'status-unhealthy';
                 const statusText = node.status.toUpperCase();
@@ -484,21 +711,30 @@
                 let metricsHTML = '';
                 if (metricsData.metrics) {
                     const groupedByWorkload = {};
-                    metricsData.metrics.forEach(m => {
+                    metricsData.metrics
+                        .filter(m => isAllowedKpiName(m.KPI_name))
+                        .forEach(m => {
                         if (!groupedByWorkload[m.WorkloadTag]) {
                             groupedByWorkload[m.WorkloadTag] = [];
                         }
                         groupedByWorkload[m.WorkloadTag].push(m);
                     });
-                    
-                    Object.entries(groupedByWorkload).forEach(([workload, metrics]) => {
+
+                    const workloadEntries = currentWorkloadTag && groupedByWorkload[currentWorkloadTag]
+                        ? [[currentWorkloadTag, groupedByWorkload[currentWorkloadTag]]]
+                        : Object.entries(groupedByWorkload);
+
+                    workloadEntries.forEach(([workload, metrics]) => {
+
+                        const canonicalMetrics = aggregateCanonicalMetrics(metrics, 'avg_value');
+
                         metricsHTML += `<div class="workload-section">`;
                         metricsHTML += `<div class="workload-tag">${workload}</div>`;
-                        metrics.forEach(m => {
+                        canonicalMetrics.forEach(m => {
                             metricsHTML += `
                                 <div class="kpi-row">
-                                    <span class="kpi-name">${m.KPI_name}</span>
-                                    <span class="kpi-value">${m.avg_value}</span>
+                                    <span class="kpi-name">${m.KPI_label}</span>
+                                    <span class="kpi-value">${Number(m.value).toFixed(2)}</span>
                                 </div>
                             `;
                         });
@@ -512,92 +748,514 @@
                         <span class="status-badge ${statusClass}">${statusText}</span>
                     </div>
                     ${metricsHTML || '<div class="no-data" style="padding: 10px;">No KPI data yet</div>'}
-                    <div style="font-size: 0.8rem; color: #999; margin-top: 10px;">
+                    <div class="updated-at">
                         Updated: ${new Date(node.last_update).toLocaleTimeString()}
                     </div>
                 `;
                 container.appendChild(nodeCard);
             }
+
+            return workloadCounts;
         }
 
-        function filterChart(kpiName) {
+        function updateConnectivity(summary) {
+            const container = document.getElementById('connectivity-container');
+            if (!summary.length) {
+                container.innerHTML = '<div class="no-data">Waiting for node data...</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            summary.forEach(node => {
+                const isOnline = node.status === 'healthy';
+                const card = document.createElement('div');
+                card.className = 'connection-item';
+                card.innerHTML = `
+                    <span class="connection-status ${isOnline ? 'online' : 'offline'}"></span>
+                    <span class="connection-label">${node.NodeID}</span>
+                    <span class="connection-state">${isOnline ? 'Online' : 'Offline'}</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterChart(kpiName, button) {
             currentFilter = kpiName;
             
             document.querySelectorAll('.kpi-filter').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
-            
-            updateCharts([]);
-        }
-
-        async function updateCharts(summary) {
-            const summaryRes = await fetch('/api/dashboard/summary');
-            summary = await summaryRes.json();
-            
-            if (summary.length === 0) return;
-            
-            const nodeIds = summary.map(s => s.NodeID);
-            const workloadData = {};
-            
-            for (const nodeId of nodeIds) {
-                const res = await fetch(`/api/metrics/${nodeId}`);
-                const data = await res.json();
-                
-                data.forEach(record => {
-                    const key = `${record.NodeID}-${record.WorkloadTag}`;
-                    if (!workloadData[key]) {
-                        workloadData[key] = [];
-                    }
-                    workloadData[key].push(record);
-                });
+            if (button) {
+                button.classList.add('active');
             }
             
-            updateKPIChart(workloadData);
+            // Update chart immediately with newly filtered cache data
+            updateKPIChart();
         }
 
-        function updateKPIChart(workloadData) {
-            const canvas = document.getElementById('kpiChart');
-            const ctx = canvas.getContext('2d');
-            
-            const filteredData = Object.entries(workloadData).reduce((acc, [key, records]) => {
-                const filtered = records.filter(r => r.KPI_name === currentFilter);
-                if (filtered.length > 0) {
-                    acc[key] = filtered;
+        function isAllowedKpiName(kpiName) {
+            return Boolean(kpiName) && !EXCLUDED_KPI_NAMES.has(kpiName);
+        }
+
+        function aggregateCanonicalMetrics(records, valueField) {
+            const state = {
+                cpuCoreUtilSum: 0,
+                cpuCoreUtilCount: 0,
+                cpuTotalUtil: null,
+                cpuFreqCoreSum: 0,
+                cpuFreqCoreCount: 0,
+                cpuFreqMax: null,
+                cpuFreqMin: null,
+                memoryUsage: null,
+                diskReadMb: null,
+                diskWriteMb: null,
+                cpuTemperature: null,
+                cpuVoltage: null,
+                powerTotal: 0,
+                powerCount: 0,
+                energyTotal: 0,
+                energyCount: 0
+            };
+
+            records.forEach(record => {
+                const kpiName = record.KPI_name;
+                if (!isAllowedKpiName(kpiName)) {
+                    return;
                 }
-                return acc;
-            }, {});
-            
-            const datasets = Object.entries(filteredData).map(([key, records], idx) => ({
-                label: key,
-                data: records.reverse().map(r => r.Value),
-                borderColor: `hsl(${idx * 60}, 70%, 50%)`,
-                backgroundColor: `hsla(${idx * 60}, 70%, 50%, 0.1)`,
-                tension: 0.3,
-                fill: true
-            }));
-            
-            if (chartInstances['kpiChart']) {
-                chartInstances['kpiChart'].destroy();
+
+                const value = Number(record[valueField]);
+                if (!Number.isFinite(value)) {
+                    return;
+                }
+
+                if (kpiName.startsWith('CPU_Utility_core_')) {
+                    state.cpuCoreUtilSum += value;
+                    state.cpuCoreUtilCount += 1;
+                    return;
+                }
+                if (kpiName === 'CPU_Utility') {
+                    state.cpuTotalUtil = value;
+                    return;
+                }
+
+                if (/^CPU_FREQ_CORE_\d+_MHz$/.test(kpiName)) {
+                    state.cpuFreqCoreSum += value;
+                    state.cpuFreqCoreCount += 1;
+                    return;
+                }
+                if (kpiName === 'CPU_Freq_Max_MHz') {
+                    state.cpuFreqMax = value;
+                    return;
+                }
+                if (kpiName === 'CPU_Freq_Min_MHz') {
+                    state.cpuFreqMin = value;
+                    return;
+                }
+
+                if (kpiName === 'Memory_Usage') {
+                    state.memoryUsage = value;
+                    return;
+                }
+
+                if (kpiName === 'Disk_IO_Read_MB') {
+                    state.diskReadMb = value;
+                    return;
+                }
+                if (kpiName === 'Disk_IO_Write_MB') {
+                    state.diskWriteMb = value;
+                    return;
+                }
+
+                if (kpiName === 'CPU_Temperature_C') {
+                    state.cpuTemperature = value;
+                    return;
+                }
+                if (kpiName === 'CPU_Voltage_V') {
+                    state.cpuVoltage = value;
+                    return;
+                }
+
+                if (kpiName.startsWith('Power_Watts_')) {
+                    state.powerTotal += value;
+                    state.powerCount += 1;
+                    return;
+                }
+                if (kpiName.startsWith('Energy_Joules_')) {
+                    state.energyTotal += value;
+                    state.energyCount += 1;
+                }
+            });
+
+            const results = [];
+
+            const cpuAvg = state.cpuCoreUtilCount > 0
+                ? state.cpuCoreUtilSum / state.cpuCoreUtilCount
+                : state.cpuTotalUtil;
+            if (Number.isFinite(cpuAvg)) {
+                results.push({ KPI_name: 'CPU_Utility_Avg', KPI_label: KPI_LABELS.CPU_Utility_Avg, value: cpuAvg });
             }
-            
-            chartInstances['kpiChart'] = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: Array.from({length: 20}, (_, i) => `${i}s ago`),
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top' } },
-                    scales: { y: { beginAtZero: true } }
-                }
+
+            const freqAvg = state.cpuFreqCoreCount > 0
+                ? state.cpuFreqCoreSum / state.cpuFreqCoreCount
+                : (Number.isFinite(state.cpuFreqMax) && state.cpuFreqMax > 0 ? state.cpuFreqMax : state.cpuFreqMin);
+            if (Number.isFinite(freqAvg) && freqAvg > 0) {
+                results.push({ KPI_name: 'CPU_Frequency_MHz', KPI_label: KPI_LABELS.CPU_Frequency_MHz, value: freqAvg });
+            }
+
+            if (Number.isFinite(state.memoryUsage)) {
+                // Hidden from display by request.
+            }
+
+            if (Number.isFinite(state.diskReadMb) || Number.isFinite(state.diskWriteMb)) {
+                // Hidden from display by request.
+            }
+
+            if (Number.isFinite(state.cpuTemperature)) {
+                results.push({ KPI_name: 'CPU_Temperature_C', KPI_label: KPI_LABELS.CPU_Temperature_C, value: state.cpuTemperature });
+            }
+
+            if (Number.isFinite(state.cpuVoltage)) {
+                results.push({ KPI_name: 'CPU_Voltage_V', KPI_label: KPI_LABELS.CPU_Voltage_V, value: state.cpuVoltage });
+            }
+
+            if (state.powerCount > 0) {
+                results.push({ KPI_name: 'Power_Watts_Total', KPI_label: KPI_LABELS.Power_Watts_Total, value: state.powerTotal });
+            }
+
+            if (state.energyCount > 0) {
+                results.push({ KPI_name: 'Energy_Joules_Total', KPI_label: KPI_LABELS.Energy_Joules_Total, value: state.energyTotal });
+            }
+
+            return results;
+        }
+
+        function renderNodeSelector(summary) {
+            const select = document.getElementById('node-selector');
+            const connectedNodes = summary.filter(node => node.connected).map(node => node.NodeID);
+
+            if (!connectedNodes.length) {
+                select.innerHTML = '<option value="">No connected nodes</option>';
+                selectedTrendNodeId = null;
+                return;
+            }
+
+            if (!selectedTrendNodeId || !connectedNodes.includes(selectedTrendNodeId)) {
+                selectedTrendNodeId = connectedNodes[0];
+            }
+
+            select.innerHTML = '';
+            connectedNodes.forEach(nodeId => {
+                const option = document.createElement('option');
+                option.value = nodeId;
+                option.textContent = nodeId;
+                option.selected = nodeId === selectedTrendNodeId;
+                select.appendChild(option);
             });
         }
 
+        function onTrendNodeChange(nodeId) {
+            if (!nodeId || nodeId === selectedTrendNodeId) {
+                return;
+            }
+            selectedTrendNodeId = nodeId;
+            renderKpiFilterButtons();
+            updateKPIChart();
+            pollTrendDataFromDatabase();
+        }
+
+        function getNodeTrendState(nodeId) {
+            if (!trendStateByNode[nodeId]) {
+                trendStateByNode[nodeId] = {
+                    chartDataCache: {},
+                    latestSeriesMeta: {},
+                    trendSampleIndex: 0
+                };
+            }
+            return trendStateByNode[nodeId];
+        }
+
+        function renderKpiFilterButtons() {
+            const container = document.getElementById('kpi-selector');
+            if (!selectedTrendNodeId) {
+                container.innerHTML = '<div class="no-data" style="width: 100%;">No node selected...</div>';
+                currentFilter = null;
+                return;
+            }
+
+            const currentNodeState = getNodeTrendState(selectedTrendNodeId);
+            const allKpis = Array.from(
+                new Set(
+                    Object.values(currentNodeState.latestSeriesMeta)
+                        .map(meta => meta.kpiName)
+                        .filter(isAllowedKpiName)
+                )
+            );
+
+            if (!allKpis.length) {
+                container.innerHTML = '<div class="no-data" style="width: 100%;">No daemon KPI data available yet...</div>';
+                currentFilter = null;
+                return;
+            }
+
+            allKpis.sort((a, b) => a.localeCompare(b));
+
+            if (!currentFilter || !allKpis.includes(currentFilter)) {
+                currentFilter = KPI_PREFERENCE.find(k => allKpis.includes(k)) || allKpis[0];
+            }
+
+            container.innerHTML = '';
+            allKpis.forEach(kpiName => {
+                const button = document.createElement('button');
+                button.className = `kpi-filter${kpiName === currentFilter ? ' active' : ''}`;
+                button.textContent = KPI_LABELS[kpiName] || kpiName.replaceAll('_', ' ');
+                button.onclick = () => filterChart(kpiName, button);
+                container.appendChild(button);
+            });
+        }
+
+        function matchesKpiFilter(recordKpiName) {
+            if (!isAllowedKpiName(recordKpiName)) {
+                return false;
+            }
+            if (!currentFilter) {
+                return true;
+            }
+            return recordKpiName === currentFilter;
+        }
+
+        async function pollTrendDataFromDatabase() {
+            try {
+                const summaryRes = await fetch('/api/dashboard/summary');
+                const summary = await summaryRes.json();
+                renderNodeSelector(summary);
+
+                if (!summary.length || !selectedTrendNodeId) {
+                    return;
+                }
+
+                const currentNodeState = getNodeTrendState(selectedTrendNodeId);
+                currentNodeState.trendSampleIndex += 1;
+                const currentSample = currentNodeState.trendSampleIndex;
+                const latestBySeries = {};
+                const res = await fetch(`/api/metrics/${selectedTrendNodeId}`);
+                const rows = await res.json();
+
+                const rowsWithTimestamp = rows
+                    .map(record => ({ ...record, timestamp: record.timestamp || record.Timestamp }))
+                    .filter(record => Boolean(record.timestamp));
+
+                const latestTimestamp = rowsWithTimestamp.reduce((latest, row) => {
+                    if (!latest) {
+                        return row.timestamp;
+                    }
+                    return new Date(row.timestamp) > new Date(latest) ? row.timestamp : latest;
+                }, null);
+
+                const latestRows = latestTimestamp
+                    ? rowsWithTimestamp.filter(row => row.timestamp === latestTimestamp)
+                    : [];
+
+                const canonicalMetrics = aggregateCanonicalMetrics(latestRows, 'Value');
+
+                canonicalMetrics.forEach(metric => {
+                    const seriesKey = `${selectedTrendNodeId}-${metric.KPI_name}`;
+                    latestBySeries[seriesKey] = {
+                        timestamp: latestTimestamp,
+                        value: metric.value,
+                        kpiName: metric.KPI_name
+                    };
+                });
+
+                Object.entries(latestBySeries).forEach(([seriesKey, point]) => {
+                    currentNodeState.latestSeriesMeta[seriesKey] = {
+                        kpiName: point.kpiName,
+                        lastValue: point.value,
+                        lastTimestamp: point.timestamp
+                    };
+
+                    if (!currentNodeState.chartDataCache[seriesKey]) {
+                        currentNodeState.chartDataCache[seriesKey] = [];
+                    }
+
+                    currentNodeState.chartDataCache[seriesKey].push({
+                        x: currentSample,
+                        y: point.value,
+                        timestamp: point.timestamp,
+                        KPI_name: point.kpiName
+                    });
+
+                    if (currentNodeState.chartDataCache[seriesKey].length > MAX_HISTORY_POINTS) {
+                        currentNodeState.chartDataCache[seriesKey] = currentNodeState.chartDataCache[seriesKey].slice(-MAX_HISTORY_POINTS);
+                    }
+                });
+
+                // Carry forward previous value so every interval extends existing lines.
+                Object.entries(currentNodeState.latestSeriesMeta).forEach(([seriesKey, meta]) => {
+                    if (latestBySeries[seriesKey]) {
+                        return;
+                    }
+                    if (!isAllowedKpiName(meta.kpiName)) {
+                        return;
+                    }
+
+                    if (!currentNodeState.chartDataCache[seriesKey]) {
+                        currentNodeState.chartDataCache[seriesKey] = [];
+                    }
+
+                    currentNodeState.chartDataCache[seriesKey].push({
+                        x: currentSample,
+                        y: meta.lastValue,
+                        timestamp: meta.lastTimestamp,
+                        KPI_name: meta.kpiName
+                    });
+
+                    if (currentNodeState.chartDataCache[seriesKey].length > MAX_HISTORY_POINTS) {
+                        currentNodeState.chartDataCache[seriesKey] = currentNodeState.chartDataCache[seriesKey].slice(-MAX_HISTORY_POINTS);
+                    }
+                });
+
+                renderKpiFilterButtons();
+                updateKPIChart();
+            } catch (err) {
+                console.error('Trend poll error:', err);
+            }
+        }
+
+        function updateKPIChart() {
+            const canvas = document.getElementById('kpiChart');
+            const ctx = canvas.getContext('2d');
+            const chartScroll = document.getElementById('chart-scroll');
+            const currentNodeState = selectedTrendNodeId ? getNodeTrendState(selectedTrendNodeId) : null;
+            const seriesCache = currentNodeState ? currentNodeState.chartDataCache : {};
+            
+            // Filter cache for current KPI filter and prepare datasets
+            const datasets = [];
+            
+            Object.entries(seriesCache).forEach(([key, records], idx) => {
+                if (!Array.isArray(records)) {
+                    return;
+                }
+
+                const filtered = records.filter(r => matchesKpiFilter(r.KPI_name));
+                
+                if (filtered.length > 0) {
+                    const sorted = filtered
+                        .slice()
+                        .sort((a, b) => a.x - b.x);
+                    const points = sorted.map(r => ({ x: r.x, y: r.y }));
+                    if (!points.length) {
+                        return;
+                    }
+                    
+                    datasets.push({
+                        label: key,
+                        data: points,
+                        borderColor: `hsl(${(idx * 57) % 360}, 72%, 42%)`,
+                        backgroundColor: `hsla(${(idx * 57) % 360}, 72%, 42%, 0.12)`,
+                        tension: 0.3,
+                        fill: true,
+                        borderWidth: 2.5,
+                        pointRadius: 2,
+                        pointBackgroundColor: `hsl(${(idx * 57) % 360}, 72%, 42%)`,
+                        pointHoverRadius: 5,
+                        pointHoverBorderWidth: 2
+                    });
+                }
+            });
+
+            const shouldFollowRightEdge = chartScroll
+                ? (chartScroll.scrollWidth - chartScroll.clientWidth - chartScroll.scrollLeft) < 40
+                : true;
+
+            const maxPoints = datasets.reduce((acc, ds) => Math.max(acc, ds.data.length), 0);
+            const desiredWidth = Math.max(CHART_MIN_WIDTH_PX, maxPoints * POINT_SPACING_PX);
+            canvas.style.width = `${desiredWidth}px`;
+            canvas.style.height = '360px';
+            
+            if (!chartInstances['kpiChart']) {
+                chartInstances['kpiChart'] = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: false,
+                        parsing: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    boxWidth: 12,
+                                    boxHeight: 12,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle',
+                                    padding: 15,
+                                    font: { size: 12 }
+                                }
+                            },
+                            filler: {
+                                propagate: true
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title(items) {
+                                        if (!items.length) return '';
+                                        return `Sample ${items[0].parsed.x}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { 
+                                    color: 'rgba(229, 231, 235, 0.5)',
+                                    drawBorder: true
+                                },
+                                ticks: { 
+                                    color: '#4b5563',
+                                    font: { size: 11 }
+                                }
+                            },
+                            x: {
+                                type: 'linear',
+                                grid: { 
+                                    color: 'rgba(243, 244, 246, 0.8)',
+                                    drawBorder: true
+                                },
+                                ticks: { 
+                                    color: '#6b7280',
+                                    font: { size: 10 },
+                                    maxRotation: 45,
+                                    minRotation: 0,
+                                    callback(value) {
+                                        return value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                chartInstances['kpiChart'].data.datasets = datasets;
+                chartInstances['kpiChart'].update('none');
+            }
+
+            if (chartScroll && datasets.length > 0 && shouldFollowRightEdge) {
+                chartScroll.scrollLeft = chartScroll.scrollWidth;
+            }
+        }
+
         refreshDashboard();
+        pollTrendDataFromDatabase();
         setInterval(refreshDashboard, 10000);
+        setInterval(pollTrendDataFromDatabase, TREND_POLL_INTERVAL_MS);
     </script>
 </body>
 </html>
