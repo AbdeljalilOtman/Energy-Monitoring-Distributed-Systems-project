@@ -5,8 +5,6 @@ This is the main entry point for the Edge Node. It runs continuously,
 calling the Payload Builder every N seconds, and pushes the resulting JSON
 to the Backend.
 
-The daemon now uses a transformer to convert the nested payload format
-to the backend's flat array format for consistency with the central monitoring system.
 """
 
 import time
